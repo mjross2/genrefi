@@ -58,6 +58,17 @@ router.patch('/:id', getFolder, async (req, res) => {
     }
 });
 
+// update one by name
+router.patch('/name/:name', getFolderByName, async (req, res) => {
+    Object.assign(res.folder, req.body);
+    try {
+        const updatedFolder = await res.folder.save();
+        res.status(201).json(updatedFolder);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // delete one
 // TODO: not fully functional: "res.folder.remove is not a function"
 router.delete('/:id', getFolder, async (req, res) => {

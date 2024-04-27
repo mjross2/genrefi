@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/";
+const BASE_URL = "http://localhost:5000/folders";
 
 export const createFolder = async (name: string) => {
   try {
-    const res = await axios.post(`${BASE_URL}/folders/`, {
+    const res = await axios.post(`${BASE_URL}/`, {
       name: name,
     });
-    if (res.status === 200) {
+    if (res.status === 201) {
       return res.data;
     }
   } catch (error) {
@@ -17,7 +17,7 @@ export const createFolder = async (name: string) => {
 
 export const getFolders = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/folders/`);
+    const res = await axios.get(`${BASE_URL}/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -28,7 +28,7 @@ export const getFolders = async () => {
 
 export const addToFolder = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/folders/`);
+    const res = await axios.get(`${BASE_URL}/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -38,10 +38,21 @@ export const addToFolder = async () => {
 };
 
 export const getFolderByName = async (name: any) => {
-  console.log(`${BASE_URL}/folders/name/${name}`);
   try {
-    const res = await axios.get(`${BASE_URL}/folders/name/${name}`);
+    const res = await axios.get(`${BASE_URL}/name/${name}`);
     if (res.status === 200) {
+      return res.data;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// updates folder by name
+export const updateFolder = async (name: any, updatedFolder: any) => {
+  try {
+    const res = await axios.patch(`${BASE_URL}/name/${name}`, updatedFolder);
+    if (res.status === 201) {
       return res.data;
     }
   } catch (error) {
