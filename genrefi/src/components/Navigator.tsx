@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, createContext, ReactNode, useRef } from 'react';
 import ContentAdder from './ContentAdder';
-import { getFolderByName, updateFolder, createFolder } from '../api/folder';
+import { getFolderByName, updateFolder, createFolder, getFolders } from '../api/folder';
 
 // Overhead
 
@@ -26,6 +26,46 @@ export const Navigator: React.FC<Children> = () => {
     const [folders, setFolders] = useState(["ROOT"]);
     const [contents, setContents] = useState([""]);
     const rendered = useRef(false);
+    const foldersReady = useRef(true); // used to prevent folder update happening prematurely
+
+    // Buttons
+
+    const selectItem = (name: string) => {
+        // if yt link
+            // that's a whole thing
+        // else assume folder
+        const updatedFolders = [...folders, name];
+        foldersReady.current = false;
+        setFolders(updatedFolders);
+    };
+
+    useEffect(() => {
+        if (rendered.current) {
+            foldersReady.current = true;
+            uploadLocalChanges();
+        }
+    }, [folders])
+
+
+    // Changing current folder
+
+    useEffect(() => {
+        fetchAndRenderCurrentFolder();
+    }, [folders]);
+
+    const fetchAndRenderCurrentFolder = async () => {
+        const currentFolder = await getFolderByName(folders[folders.length - 1]);
+        if (currentFolder) {
+            setContents(currentFolder.contents);
+        }
+    };
+
+    // Triggered by children
+    
+    const addItemToContents = (item: string) => {
+        const updatedContents = [...contents, item];
+        setContents(updatedContents);
+    }
 
     useEffect(() => {
         if (!rendered.current && contents[0] != "") {
@@ -36,11 +76,8 @@ export const Navigator: React.FC<Children> = () => {
         }
     }, [contents]);
 
-    useEffect(() => {
-        fetchAndRenderCurrentFolder();
-    }, [folders]);
-
     const uploadLocalChanges = async () => {
+        if (!foldersReady.current) return;
         // update in MongoDB if changes occur after render     
         const folderName = folders[getFolderByName.length - 1];
         const updatedFolder = {
@@ -52,31 +89,11 @@ export const Navigator: React.FC<Children> = () => {
         for (let itemName of contents){
             // todo: add YT item check
             try {
-                const remoteFolder = await getFolderByName(itemName);
-                alert(remoteFolder);
+                await getFolderByName(itemName);
             } catch (err) {
                 createFolder(itemName);
             }
         }
-    }
-
-    const selectItem = (name: string) => {
-        // if yt link
-            // that's a whole thing
-        // else assume folder
-            // add to folder array and rerender
-    };
-
-    const fetchAndRenderCurrentFolder = async () => {
-        const currentFolder = await getFolderByName(folders[folders.length - 1]);
-        if (currentFolder) {
-            setContents(currentFolder.contents);
-        }
-    };
-
-    const addItemToContents = (item: string) => {
-        const updatedContents = [...contents, item];
-        setContents(updatedContents);
     }
 
     // Using useMemo to avoid unnecessary re-renders
@@ -88,7 +105,7 @@ export const Navigator: React.FC<Children> = () => {
         <NavigatorContext.Provider value={contextValue}>
             {rendered.current && (<>
                 <h1>Genrefi</h1>
-                <p>{folders[folders.length - 1]}:</p>
+                <h2>{folders[folders.length - 1]}:</h2>
                 <div className="card">
                     <ul>
                         {contents.map((itemName) => (
@@ -101,6 +118,7 @@ export const Navigator: React.FC<Children> = () => {
                     </ul>
                 </div>
                 <ContentAdder />
+                {(foldersReady.current && <p>fodlers ready</p>) || <p>not ready</p> }
             </>)}
         </NavigatorContext.Provider>
     );

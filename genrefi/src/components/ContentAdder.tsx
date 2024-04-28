@@ -19,14 +19,10 @@ function ContentAdder() {
             setAddingSomething(false);
             setInput('');
             if (input.trim().length != 0){
-                addItemToFolder();
+                addItemToContents(input);
             }
         }
     };
-
-    const addItemToFolder = () => {        
-        addItemToContents(input);
-    }
 
     return (
     <>
