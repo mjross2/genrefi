@@ -1,1 +1,15 @@
 GET http://localhost:5000/folders/name/ROOT
+
+###
+
+PATCH http://localhost:5000/folders/name/ROOT
+Content-Type: application/json
+
+{
+    "name": "ROOT",
+    "contents": [
+        "Hip Hop",
+        "R&B",
+        "Rock"
+    ]
+}

@@ -4,7 +4,7 @@ import { NavigatorContext } from "./Navigator";
 function ContentAdder() {
     const [input, setInput] = useState("");
     const [addingSomething, setAddingSomething] = useState(false);
-    const { folders, contents, setContents } = useContext(NavigatorContext);
+    const { folders, contents, addItemToContents } = useContext(NavigatorContext);
 
     const addSomething = () => {
         setAddingSomething(true);
@@ -24,11 +24,8 @@ function ContentAdder() {
         }
     };
 
-    const addItemToFolder = () => {
-        const currentFolder = folders[folders.length - 1];
-        const updated = contents;
-        updated.push(input);
-        setContents(updated);
+    const addItemToFolder = () => {        
+        addItemToContents(input);
     }
 
     return (

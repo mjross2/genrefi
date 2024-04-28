@@ -50,9 +50,11 @@ export const getFolderByName = async (name: any) => {
 
 // updates folder by name
 export const updateFolder = async (name: any, updatedFolder: any) => {
+  console.log(updatedFolder)
   try {
     const res = await axios.patch(`${BASE_URL}/name/${name}`, updatedFolder);
     if (res.status === 201) {
+      console.log('201');
       return res.data;
     }
   } catch (error) {
