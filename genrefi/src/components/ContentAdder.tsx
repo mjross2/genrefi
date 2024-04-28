@@ -1,10 +1,11 @@
-import { SetStateAction, useContext, useRef, useState } from "react";
+import { SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { NavigatorContext } from "./Navigator";
 
 function ContentAdder() {
     const [input, setInput] = useState("");
     const [addingSomething, setAddingSomething] = useState(false);
-    const { folders, contents, addItemToContents } = useContext(NavigatorContext);
+    const { addItemToContents } = useContext(NavigatorContext);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const addSomething = () => {
         setAddingSomething(true);
@@ -24,6 +25,13 @@ function ContentAdder() {
         }
     };
 
+    // automatically select textbox
+    useEffect(() => {
+        if (addingSomething && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [addingSomething])
+
     return (
     <>
         {(!addingSomething && (
@@ -32,6 +40,7 @@ function ContentAdder() {
             <div className="card">
                 <input
                     type="text"
+                    ref={inputRef}
                     value={input}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}

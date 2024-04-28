@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useMemo, createContext, ReactNode, useRef } from 'react';
+import { IconContext } from "react-icons";
+import { FaPersonWalkingArrowLoopLeft } from "react-icons/fa6";
 import ContentAdder from './ContentAdder';
 import { getFolderByName, updateFolder, createFolder } from '../api/folder';
+import ItemMover from './ItemMover';
 
 // Overhead
 
@@ -26,7 +29,6 @@ export const Navigator: React.FC<Children> = () => {
     const [folders, setFolders] = useState(["ROOT"]);
     const [contents, setContents] = useState([""]);
     const rendered = useRef(false);
-    const foldersReady = useRef(true); // used to prevent folder update happening prematurely
 
     // Buttons
 
@@ -35,19 +37,8 @@ export const Navigator: React.FC<Children> = () => {
             // that's a whole thing
         // else assume folder
         const updatedFolders = [...folders, name];
-        foldersReady.current = false;
         setFolders(updatedFolders);
     };
-
-    useEffect(() => {
-        console.log(folders);
-        if (rendered.current) {
-            foldersReady.current = true;
-            console.log("uploading local changes from folders useEffect");
-            uploadLocalChanges();
-        }
-    }, [folders])
-
 
     // Changing current folder
 
@@ -75,18 +66,14 @@ export const Navigator: React.FC<Children> = () => {
             rendered.current = true;
         }
         // update database when local changes are detected
-        if (rendered.current && foldersReady.current) {
-            console.log("uploading local changes from contents useEffect");
+        if (rendered.current) {
             uploadLocalChanges();
         }
     }, [contents]);
 
     const uploadLocalChanges = async () => {
-        if (!foldersReady.current) return;
-        console.log("FR uploading local changes");
-        foldersReady.current = false;
         // update in MongoDB if changes occur after render     
-        const folderName = folders[getFolderByName.length - 1];
+        const folderName = folders[folders.length - 1];
         const updatedFolder = {
             name: folderName,
             contents: contents
@@ -103,6 +90,13 @@ export const Navigator: React.FC<Children> = () => {
         }
     }
 
+    // back button
+    const goBack = () => {
+        const updated = [...folders];
+        updated.pop();
+        setFolders(updated);
+    }
+
     // Using useMemo to avoid unnecessary re-renders
     const contextValue = useMemo(() => ({
         folders, contents, addItemToContents
@@ -110,23 +104,29 @@ export const Navigator: React.FC<Children> = () => {
 
     return (
         <NavigatorContext.Provider value={contextValue}>
-            {rendered.current && (<>
-                <h1>Genrefi</h1>
-                <h2>{folders[folders.length - 1]}:</h2>
-                <div className="card">
-                    <ul>
-                        {contents.map((itemName) => (
-                            <li key={itemName}>
-                                <button onClick={() => selectItem(itemName)}>
+            <IconContext.Provider value={{ size: "3em", className: "global-class-name" }}> 
+                {rendered.current && (<>
+                    <h1>Genrefi</h1>
+                    <h2>{folders[folders.length - 1]}:</h2>
+                    <ItemMover />
+                    <div className="card">
+                        <div className="grid-container">
+                            {contents.map((itemName) => (
+                                <button key={itemName} onClick={() => selectItem(itemName)} className="grid-item">
                                     {itemName}
                                 </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <ContentAdder />
-                {(foldersReady.current && <p>folders ready</p>) || <p>not ready</p> }
-            </>)}
+                            ))}
+                        </div>
+                    </div>
+                    <ContentAdder />
+                    <br /><br />
+                    {folders.length > 1 && (
+                        <button onClick={goBack}>
+                            <FaPersonWalkingArrowLoopLeft  />
+                        </button>
+                    )}
+                </>)}
+            </IconContext.Provider>
         </NavigatorContext.Provider>
     );
 };
