@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, createContext, ReactNode, useRef } from 'react';
 import ContentAdder from './ContentAdder';
-import { getFolderByName, updateFolder, createFolder, getFolders } from '../api/folder';
+import { getFolderByName, updateFolder, createFolder } from '../api/folder';
 
 // Overhead
 
@@ -40,8 +40,10 @@ export const Navigator: React.FC<Children> = () => {
     };
 
     useEffect(() => {
+        console.log(folders);
         if (rendered.current) {
             foldersReady.current = true;
+            console.log("uploading local changes from folders useEffect");
             uploadLocalChanges();
         }
     }, [folders])
@@ -68,16 +70,21 @@ export const Navigator: React.FC<Children> = () => {
     }
 
     useEffect(() => {
+        // Loading screen
         if (!rendered.current && contents[0] != "") {
             rendered.current = true;
         }
-        if (rendered.current) {
+        // update database when local changes are detected
+        if (rendered.current && foldersReady.current) {
+            console.log("uploading local changes from contents useEffect");
             uploadLocalChanges();
         }
     }, [contents]);
 
     const uploadLocalChanges = async () => {
         if (!foldersReady.current) return;
+        console.log("FR uploading local changes");
+        foldersReady.current = false;
         // update in MongoDB if changes occur after render     
         const folderName = folders[getFolderByName.length - 1];
         const updatedFolder = {
@@ -118,7 +125,7 @@ export const Navigator: React.FC<Children> = () => {
                     </ul>
                 </div>
                 <ContentAdder />
-                {(foldersReady.current && <p>fodlers ready</p>) || <p>not ready</p> }
+                {(foldersReady.current && <p>folders ready</p>) || <p>not ready</p> }
             </>)}
         </NavigatorContext.Provider>
     );
