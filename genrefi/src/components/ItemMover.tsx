@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
 import { NavigatorContext } from "./Navigator";
-import { getFolderByName } from "../api/folder";
+import { getFolderByName, updateFolder } from "../api/folder";
 
 function ItemMover() {
     const [movingSomething, setMovingSomething] = useState(false);
     const [itemBeingMoved, setItemBeingMoved] = useState('');
     const [itemBeingMovedParent, setItemBeingMovedParent] = useState('');
-    const { folders } = useContext(NavigatorContext);
+    const { folders, fetchAndRenderCurrentFolder, goBack } = useContext(NavigatorContext);
 
     const enterMovingMode = () => {
         if (folders.length < 2) {
@@ -19,14 +19,27 @@ function ItemMover() {
     }
 
     const place = async () => {
-        const localFolder = await getFolderByName(itemBeingMovedParent);
-        const updated = localFolder.filter(item => item !== itemBeingMoved);
+        // Remove from old parent
+        let parent = await getFolderByName(itemBeingMovedParent);
+        let updatedContents = parent.contents.filter((item: string) => item !== itemBeingMoved);
+        updateFolder(itemBeingMovedParent, {name: itemBeingMovedParent, contents: updatedContents});
+        // Add to new parent
+        const newParentName = folders[folders.length - 1];
+        parent = await getFolderByName(newParentName);
+        updatedContents = [...parent.contents, itemBeingMoved];
+        await updateFolder(newParentName, {name: newParentName, contents: updatedContents});
+        
+        fetchAndRenderCurrentFolder();
         setMovingSomething(false);
     }
 
-    const remove = () => {
+    const remove = async () => {
+        // Remove from old parent
+        const parent = await getFolderByName(itemBeingMovedParent);
+        const updatedContents = parent.contents.filter((item: string) => item !== itemBeingMoved);
+        await updateFolder(itemBeingMovedParent, {name: itemBeingMovedParent, contents: updatedContents});
+        goBack();
         setMovingSomething(false);
-        alert("delete unimplemented")
     }
 
     return (

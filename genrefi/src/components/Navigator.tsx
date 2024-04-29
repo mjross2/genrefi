@@ -4,6 +4,7 @@ import { FaPersonWalkingArrowLoopLeft } from "react-icons/fa6";
 import ContentAdder from './ContentAdder';
 import { getFolderByName, updateFolder, createFolder } from '../api/folder';
 import ItemMover from './ItemMover';
+import { getVideoName } from '../api/youtube';
 
 // Overhead
 
@@ -15,12 +16,16 @@ interface NavigatorContextType {
     folders: string[];
     contents: string[];
     addItemToContents: (item: string) => void;
+    fetchAndRenderCurrentFolder: () => void;
+    goBack: () => void;
 }
 
 export const NavigatorContext = createContext<NavigatorContextType>({
     folders: [],
     contents: [],
-    addItemToContents: () => {}
+    addItemToContents: () => {},
+    fetchAndRenderCurrentFolder: () => {},
+    goBack: () => {}
 });
 
 // Component
@@ -55,9 +60,14 @@ export const Navigator: React.FC<Children> = () => {
 
     // Triggered by children
     
-    const addItemToContents = (item: string) => {
-        const updatedContents = [...contents, item];
-        setContents(updatedContents);
+    const addItemToContents = async (item: string) => {
+        if (item.split('/')[0] === 'https:'){
+            let title = await getVideoName(item);
+            
+        } else {
+            const updatedContents = [...contents, item];
+            setContents(updatedContents);
+        }
     }
 
     useEffect(() => {
@@ -99,7 +109,7 @@ export const Navigator: React.FC<Children> = () => {
 
     // Using useMemo to avoid unnecessary re-renders
     const contextValue = useMemo(() => ({
-        folders, contents, addItemToContents
+        folders, contents, addItemToContents, fetchAndRenderCurrentFolder, goBack
     }), [folders, contents, addItemToContents]);
 
     return (
