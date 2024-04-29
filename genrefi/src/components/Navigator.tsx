@@ -5,6 +5,7 @@ import ContentAdder from './ContentAdder';
 import { getFolderByName, updateFolder, createFolder } from '../api/folder';
 import ItemMover from './ItemMover';
 import { getVideoName } from '../api/youtube';
+import YouTubePlayer from './YouTubePlayer';
 
 // Overhead
 
@@ -63,7 +64,7 @@ export const Navigator: React.FC<Children> = () => {
     const addItemToContents = async (item: string) => {
         if (item.split('/')[0] === 'https:'){
             let title = await getVideoName(item);
-            
+
         } else {
             const updatedContents = [...contents, item];
             setContents(updatedContents);
@@ -119,6 +120,8 @@ export const Navigator: React.FC<Children> = () => {
                     <h1>Genrefi</h1>
                     <h2>{folders[folders.length - 1]}:</h2>
                     <ItemMover />
+                    <br /><br />
+                    <YouTubePlayer />
                     <div className="card">
                         <div className="grid-container">
                             {contents.map((itemName) => (
