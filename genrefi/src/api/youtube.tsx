@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_KEY } from '../../../config';
+import { API_KEY, OAUTH_TOKEN } from '../../../config';
 
 export const getVideoName = (url: string) => {
     // Make a request to the YouTube API
@@ -32,37 +32,19 @@ export const createRealPlaylist = async (name: string): Promise<{ id: string; }>
   };
 
   try {
-    const res = await axios.post(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&key=${API_KEY}`, JSON.stringify(playlistData), {
+    const res = await axios.post(`https://www.googleapis.com/youtube/v3/playlists?part=snippet`, JSON.stringify(playlistData), {
       headers: {
+        'Authorization': `Bearer ${OAUTH_TOKEN}`,
         'Content-Type': 'application/json'
       }
     });
-    if (res.status === 201) {
+    console.log(res.status);
+    if (res.status === 200) {
+      console.log('success');
       return res.data;
     }
   } catch (error) {
     throw error;
   }
   return { id: 'failed'}
-  /*
-  // Make a POST request to create the playlist
-  fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&key=${API_KEY}`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(playlistData)
-  })
-  .then(response => {
-    if (!response.ok) throw new Error('Failed to create playlist');
-    return response.json();
-  })
-  .then(data => {
-    console.log('Playlist created successfully:', data);
-  })
-  .catch(error => {
-    console.error('Error creating playlist:', error);
-  });
-  return {id: 'failed'}
-  */
 }
