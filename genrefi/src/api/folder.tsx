@@ -26,6 +26,7 @@ export const getFolders = async () => {
   }
 };
 
+/*
 export const addToFolder = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/`);
@@ -36,6 +37,7 @@ export const addToFolder = async () => {
     throw error;
   }
 };
+*/
 
 export const getFolderByName = async (name: any) => {
   try {

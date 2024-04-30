@@ -23,6 +23,8 @@ app.use(cors());
 // Routes
 const foldersRouter = require("./routes/folders");
 app.use('/folders', foldersRouter);
+const playlistsRouter = require("./routes/playlists");
+app.use('/playlists', playlistsRouter);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
