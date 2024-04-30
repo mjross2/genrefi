@@ -1,10 +1,19 @@
-import { SetStateAction, useContext, useEffect, useRef, useState } from "react";
-import YouTube from 'react-youtube';
+import { useContext, useEffect, useState } from "react";
 import { NavigatorContext } from "./Navigator";
+import { getPlaylistByFolder } from "../api/playlist";
 
 function YouTubePlayer() {
     const [playlistId, setPlaylistId] = useState("PLDHHlzPhoAweXNeAiscSvieMBSs4wZlsw");
     const { folders } = useContext(NavigatorContext);
+
+    useEffect(() => {
+        getFolderPlaylist();
+    }, [folders])
+
+    const getFolderPlaylist = async () => {
+        const playlistInfo = await getPlaylistByFolder(folders[folders.length - 1])
+        setPlaylistId(playlistInfo.youTubeId);
+    }
 
     return (
     <>

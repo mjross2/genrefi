@@ -2,13 +2,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+import { DATABASE_URL } from '../config';
 
 // server app setup
 const app = express();
 const PORT = process.env.PORT || 5000; // Main app usually runs on 3000
 
 // Connect to MongoDB database
-mongoose.connect(process.env.MONGODB_URI|| "mongodb+srv://mitchross1252:aznKYEhnn1wKlS2A@cluster0.5emwp3b.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+mongoose.connect(process.env.MONGODB_URI|| DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

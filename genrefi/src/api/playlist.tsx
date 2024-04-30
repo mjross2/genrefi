@@ -6,13 +6,11 @@ const BASE_URL = "http://localhost:5000/playlists";
 
 export const createPlaylist = async (folder: string) => {
   try {
-    const realPlaylist = createRealPlaylist(folder);
-    // TODO: how to deal with this type problem
-    const playlistId = ;
-    // Create reference in Mongo
+    const realPlaylist = await createRealPlaylist(folder);
+    const playlistId = realPlaylist.id;
     const res = await axios.post(`${BASE_URL}/`, {
-      folder: folder
-      // TODO: youTubeId
+      folder: folder,
+      youTubeId: playlistId
     });
     if (res.status === 201) {
       return res.data;
@@ -50,11 +48,9 @@ export const getPlaylistByFolder = async (folder: any) => {
     const res = await axios.get(`${BASE_URL}/folder/${folder}`);
     if (res.status === 200) {
       return res.data;
-    } else if (res.status === 404) {
-        return await createPlaylist(folder);
     }
   } catch (error) {
-    throw error;
+    return await createPlaylist(folder);
   }
 };
 
