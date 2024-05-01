@@ -35,13 +35,11 @@ export const Navigator: React.FC<Children> = () => {
     const [folders, setFolders] = useState(["ROOT"]);
     const [contents, setContents] = useState([""]);
     const rendered = useRef(false);
+    const [currentFolderName, setCurrentFolderName] = useState("Genrefi");
 
     // Buttons
 
     const selectItem = (name: string) => {
-        // if yt link
-            // that's a whole thing
-        // else assume folder
         const updatedFolders = [...folders, name];
         setFolders(updatedFolders);
     };
@@ -49,6 +47,12 @@ export const Navigator: React.FC<Children> = () => {
     // Changing current folder
 
     useEffect(() => {
+        const literalFolderName = folders[folders.length - 1];
+        if (literalFolderName === "ROOT") {
+            setCurrentFolderName("Genrefi");
+        } else {
+            setCurrentFolderName(literalFolderName);
+        }
         fetchAndRenderCurrentFolder();
     }, [folders]);
 
@@ -64,7 +68,7 @@ export const Navigator: React.FC<Children> = () => {
     const addItemToContents = async (item: string) => {
         if (item.split('/')[0] === 'https:'){
             let title = await getVideoName(item);
-
+            alert(title)
         } else {
             const updatedContents = [...contents, item];
             setContents(updatedContents);
@@ -117,11 +121,11 @@ export const Navigator: React.FC<Children> = () => {
         <NavigatorContext.Provider value={contextValue}>
             <IconContext.Provider value={{ size: "3em", className: "global-class-name" }}> 
                 {rendered.current && (<>
-                    <h1>Genrefi</h1>
-                    <h2>{folders[folders.length - 1]}:</h2>
+                    <h1>{currentFolderName}</h1>
                     <ItemMover />
                     <br /><br />
                     <YouTubePlayer />
+                    <h3>Subgenres:</h3>
                     <div className="card">
                         <div className="grid-container">
                             {contents.map((itemName) => (

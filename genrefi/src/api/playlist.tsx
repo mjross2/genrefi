@@ -50,7 +50,11 @@ export const getPlaylistByFolder = async (folder: any) => {
       return res.data;
     }
   } catch (error) {
-    return await createPlaylist(folder);
+    try{
+      return await createPlaylist(folder);
+    } catch (e) {
+      throw e;
+    }
   }
 };
 
